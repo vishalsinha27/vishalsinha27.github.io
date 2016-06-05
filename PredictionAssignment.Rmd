@@ -1,0 +1,64 @@
+---
+title: "Machine Learning Prediction Assignment"
+output: html_document
+author: Vishal Sinha
+---
+
+Prediction Assignment.
+
+Download the training data file and load it...
+```{r}
+library(caret)
+trainingFileName <- "pml-training.csv"
+
+if (!file.exists(trainingFileName)) {
+  trainingFileUrl <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+  download.file(trainingFileUrl, destfile =trainingFileName, method="curl", mode="wb" )
+}
+trainingDataOrg <- read.csv(trainingFileName, header=TRUE,na.strings=c("NA","", "#DIV/0!"))
+
+
+```
+Remove the columns which has zero variance or not relevant such as the first 7 columns contains serial number and timestamps.
+```{r}
+columns <- c(8:11, 37:49,60:68,84:86, 102, 113:124,140,151:160)
+
+trainingData <- trainingDataOrg[,columns]
+```
+
+Divide the training file in 2 sets train and test. Train set contains 60% of the data.
+
+```{r}
+inTrain <- createDataPartition(trainingData$classe, p=0.6)[[1]]
+training <- trainingData[inTrain,]
+testing <- trainingData[-inTrain,]
+
+```
+#Build the Model.
+Several models were considered and run for this analysis including linear discriminant analysis (lda), Recursive Partitioning and Regression Trees (rpart), boosting (nba), generalized linear models (glm), and random forests (rf). The variable to predict is classe which is a classification variable. A clustering algorithm will be suitable. For analysis purpose, we will only compare Random Forest and Linear Discriminant Analysis.
+
+## Random Forest
+
+```{r, echo=FALSE}
+set.seed(1234)
+rfModel <- train(classe~.,data=training,method="rf",allowParallel=TRUE)
+
+```
+
+With the model in place. Lets see how the prediction looks like and check the accuracy.
+
+```{r}
+confusionMatrix(predict(rfModel,newdata=testing), testing$classe)
+```
+## Linear Discriminant Analysis
+Let us also predict with linear discriminant analysis and check the accuracy. 
+```{r}
+set.seed(1234)
+ldaModel <- train(classe ~ ., method="lda", data=training)
+confusionMatrix(predict(ldaModel, newdata=testing), testing$classe)
+```
+
+#Conclusion
+As seen from the confusion matrix for lda and rf, The Random Forest model is more than 99% accurate for all the classes. The accuracy level for Linear Discriminant Analysis model is between 77 and 86% for different classes. 
+ 
+
