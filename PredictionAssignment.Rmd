@@ -59,6 +59,5 @@ confusionMatrix(predict(ldaModel, newdata=testing), testing$classe)
 ```
 
 #Conclusion
-As seen from the confusion matrix for lda and rf, The Random Forest model is more than 99% accurate for all the classes. The accuracy level for Linear Discriminant Analysis model is between 77 and 86% for different classes. 
- 
+As seen from the confusion matrix for lda and rf, The Random Forest model is around 99% accurate for all the classes. The accuracy level for Linear Discriminant Analysis model is between 77 and 86% for different classes. Random Forest model is more accurate but it takes substantially more time to build than linear discriminant analysis. 
 
